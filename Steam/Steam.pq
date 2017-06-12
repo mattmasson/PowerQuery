@@ -7,8 +7,7 @@ ApiKey = LoadFromResource("apikey");
 [DataSource.Kind="Steam", Publish="Steam.Publish"]
 shared Steam.Contents = (profile as text, optional steamId as nullable text) =>
     let
-        //_steamId = if (steamId <> null) then steamId else try LookupSteamIdFromProfile(profile) otherwise error Error.Record("DataSource.Error", "Error retrieving SteamId"),
-        _steamId = if (steamId <> null) then steamId else LookupSteamIdFromProfile(profile), 
+        _steamId = if (steamId <> null) then steamId else try LookupSteamIdFromProfile(profile) otherwise error Error.Record("DataSource.Error", "Error retrieving SteamId"),
         Source = GetOwnedGames(_steamId),
         response = Source[response],
         games = response[games],
