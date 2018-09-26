@@ -1,7 +1,6 @@
 ﻿// Overview of the Steam Web API: https://developer.valvesoftware.com/wiki/Steam_Web_API#License_and_further_documentation
 section Steam;
 
-BaseImageUrl = "http://media.steampowered.com/steamcommunity/public/images/apps/";
 ApiKey = LoadFromResource("apikey");
 
 [DataSource.Kind="Steam", Publish="Steam.Publish"]
@@ -47,6 +46,9 @@ LookupSteamIdFromProfile = (profile as text) as text =>
     in
         id;
 
+BaseImageUrl = "http://media.steampowered.com/steamcommunity/public/images/apps/";
+
+// format is http://media.steampowered.com/steamcommunity/public/images/apps/<appId>/<url>.jpg
 MakeImageUrl = (appId as number, url as nullable text) as nullable text =>
     if (url = null or url = "") then 
         null 
