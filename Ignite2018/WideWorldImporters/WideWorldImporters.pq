@@ -53,59 +53,25 @@ OdbcImpl = () =>
         
         defaultConfig = BuildOdbcConfig(),
 
-        SqlCapabilities = defaultConfig[SqlCapabilities] & [
-            FractionalSecondsScale = 3
-        ],
-
-        SQLGetInfo = defaultConfig[SQLGetInfo] & [
-            // place custom overrides here
-            SQL_SQL92_PREDICATES = ODBC[SQL_SP][All],
-            SQL_AGGREGATE_FUNCTIONS = ODBC[SQL_AF][All]
-        ],
-
-        SQLGetTypeInfo = (types) => 
-            if (EnableTraceOutput <> true) then types else
-            let
-                // Outputting the entire table might be too large, and result in the value being truncated.
-                // We can output a row at a time instead with Table.TransformRows()
-                rows = Table.TransformRows(types, each Diagnostics.LogValue("SQLGetTypeInfo " & _[TYPE_NAME], _)),
-                toTable = Table.FromRecords(rows)
-            in
-                Value.ReplaceType(toTable, Value.Type(types)),                
-
-        SQLColumns = (catalogName, schemaName, tableName, columnName, source) =>
-            if (EnableTraceOutput <> true) then source else
-            // the if statement conditions will force the values to evaluated/written to diagnostics
-            if (Diagnostics.LogValue("SQLColumns.TableName", tableName) <> "***" and Diagnostics.LogValue("SQLColumns.ColumnName", columnName) <> "***") then
-                let
-                    // Outputting the entire table might be too large, and result in the value being truncated.
-                    // We can output a row at a time instead with Table.TransformRows()
-                    rows = Table.TransformRows(source, each Diagnostics.LogValue("SQLColumns", _)),
-                    toTable = Table.FromRecords(rows)
-                in
-                    Value.ReplaceType(toTable, Value.Type(source))
-            else
-                source,
-
-        OdbcDatasource = Odbc.DataSource(ConnectionString, [
-            // A logical (true/false) that sets whether to view the tables grouped by their schema names
+        options = [
             HierarchicalNavigation = true, 
-            // Prevents execution of native SQL statements. Extensions should set this to true.
             HideNativeQuery = true,
-            // Allows upconversion of numeric types
             SoftNumbers = true,
-            // Allow upconversion / resizing of numeric and string types
             TolerateConcatOverflow = true,
-            // Enables connection pooling via the system ODBC manager
             ClientConnectionPooling = true,
 
-            // These values should be set by previous steps
-            CredentialConnectionString = CredentialConnectionString,
-            SqlCapabilities = SqlCapabilities,
-            SQLColumns = SQLColumns,
-            SQLGetInfo = SQLGetInfo,
-            SQLGetTypeInfo = SQLGetTypeInfo
-        ])
+            SqlCapabilities = defaultConfig[SqlCapabilities] & [
+                FractionalSecondsScale = 3
+            ],
+
+            SQLGetInfo = defaultConfig[SQLGetInfo] & [
+                // place custom overrides here
+                SQL_SQL92_PREDICATES = ODBC[SQL_SP][All],
+                SQL_AGGREGATE_FUNCTIONS = ODBC[SQL_AF][All]
+            ]
+        ],
+
+        OdbcDatasource = Odbc.DataSource(ConnectionString, options)
     in
         OdbcDatasource; 
 
