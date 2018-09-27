@@ -111,12 +111,7 @@ OdbcImpl = () =>
 
 // Data Source Kind description
 WideWorldImporters = [
-    TestConnection = (dataSourcePath) => 
-        let
-            json = Json.Document(dataSourcePath),
-            server = json[server]   // name of function parameter
-        in
-            { "WideWorldImporters.Contents", server },
+    TestConnection = (dataSourcePath) => { "WideWorldImporters.Contents" },
     // Set supported types of authentication
     Authentication = [
         Windows = []
