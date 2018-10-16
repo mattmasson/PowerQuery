@@ -1,4 +1,4 @@
 ﻿let
-    result = Steam.Contents("zealot123")
+    result = Steam.Contents("<your steam profile id here>")
 in
     result
