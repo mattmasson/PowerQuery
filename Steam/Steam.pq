@@ -64,7 +64,7 @@ LookupSteamIdFromProfile = (profile as text) as text =>
     in
         id;
 
-BaseImageUrl = "https://media.steampowered.com/steamcommunity/public/images/apps/";
+BaseImageUrl = "http://media.steampowered.com/steamcommunity/public/images/apps/";
 
 // format is https://media.steampowered.com/steamcommunity/public/images/apps/<appId>/<url>.jpg
 MakeImageUrl = (appId as number, url as nullable text) as nullable text =>
