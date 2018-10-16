@@ -4,7 +4,25 @@ section Steam;
 ApiKey = LoadFromResource("apikey");
 
 [DataSource.Kind="Steam", Publish="Steam.Publish"]
-shared Steam.Contents = (profile as text, optional steamId as nullable text) =>
+shared Steam.Contents = Value.ReplaceType(ContentsImpl, SteamContentsType);
+
+SteamContentsType = type function (
+    profile as (type text meta [
+        Documentation.FieldCaption = "Profile",
+        Documentation.FieldDescription = "Steam public profile name",
+        DataSource.Path = false // don't include in data source path calculation
+    ]),
+    optional steamId as (type text meta [
+        Documentation.FieldCaption = "Steam ID",
+        Documentation.FieldDescription = "SteamID64 value. You can provide this value to avoid the additional lookup."
+    ]))
+
+    as table meta [
+        Documentation.Name = "Steam Games",
+        Documentation.LongDescription = "Steam Games - list all games you own on the steam platform"
+    ];
+
+ContentsImpl = (profile as text, optional steamId as nullable text) =>
     let
         _steamId = if (steamId <> null) then steamId else try LookupSteamIdFromProfile(profile) otherwise error Error.Record("DataSource.Error", "Error retrieving SteamId"),
         Source = GetOwnedGames(_steamId),
@@ -32,23 +50,23 @@ GetOwnedGames = (steamId as text) =>
             format = "json",
             include_appinfo = "1"
         ],
-        Source = Json.Document(Web.Contents("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/", [Query = query]))
+        Source = Json.Document(Web.Contents("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/", [Query = query]))
     in
         Source;
 
 LookupSteamIdFromProfile = (profile as text) as text =>
     let
         _profile = Text.Trim(Text.Clean(profile)),
-        Source = Xml.Document(Web.Contents("http://steamcommunity.com/id/" & _profile & "?xml=1")),
+        Source = Xml.Document(Web.Contents("https://steamcommunity.com/id/" & _profile & "?xml=1")),
         Value = Source{0}[Value],
         GetId = Table.SelectRows(Value, each [Name] = "steamID64"),
         id = GetId{0}[Value]
     in
         id;
 
-BaseImageUrl = "http://media.steampowered.com/steamcommunity/public/images/apps/";
+BaseImageUrl = "https://media.steampowered.com/steamcommunity/public/images/apps/";
 
-// format is http://media.steampowered.com/steamcommunity/public/images/apps/<appId>/<url>.jpg
+// format is https://media.steampowered.com/steamcommunity/public/images/apps/<appId>/<url>.jpg
 MakeImageUrl = (appId as number, url as nullable text) as nullable text =>
     if (url = null or url = "") then 
         null 
