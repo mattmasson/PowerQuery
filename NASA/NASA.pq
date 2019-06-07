@@ -1,4 +1,5 @@
-﻿[Version="1.0.0"]
+﻿// Sample connector based on NASA APIs - https://api.nasa.gov/api.html
+[Version="1.0.0"]
 section NASA;
 
 // Load the default API key we bundle with the connector
