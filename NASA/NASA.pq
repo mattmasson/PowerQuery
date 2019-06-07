@@ -26,9 +26,19 @@ FireballResultType = type table [
 ];
 
 [DataSource.Kind="NASA", Publish="NASA.Publish"]
-shared NASA.Contents = () => FireballData();
+shared NASA.Contents = ContentsImpl;
 
-FireballData = () => 
+ContentsImpl = () => 
+    let
+        objects = #table(
+            {"Name",       "Key",        "Data",              "ItemKind", "ItemName", "IsLeaf"},{
+            {"Fireball",   "fireball",    FireballData(),     "Table",    "Table",    true}
+        }),
+        NavTable = Table.ToNavigationTable(objects, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
+    in
+        NavTable;
+
+FireballData = () as table => 
     let
         result = NasaApiRequest(Endpoint_Fireball, false, [#"vel-comp" = "true"]),
         // Transform the data into a tabular format
