@@ -9,7 +9,6 @@ DefaultApiKey = Text.FromBinary(Extension.Contents("apikey"));
 Endpoint_Fireball = "https://ssd-api.jpl.nasa.gov/fireball.api";
 
 // Schemas
-// TODO: locale for change table type
 FireballResultType = type table [
     date = DateTime.Type,
     lat = Number.Type,
