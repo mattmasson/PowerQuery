@@ -8,7 +8,7 @@ shared Fireball.Contents = () =>
     let
         source = Web.Contents(BaseUrl, [
             Query = [
-                #"req-loc" = true
+                #"req-loc" = "true"
             ]
         ]),
         json = Json.Document(source),
